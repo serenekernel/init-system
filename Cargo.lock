@@ -15,6 +15,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "812e12b5285cc515a9c72a5c1d3b6d46a19dac5acfef5265968c166106e31dd3"
 
 [[package]]
+name = "init_system"
+version = "0.1.0"
+dependencies = [
+ "lazy_static",
+ "serenelib",
+ "spin 0.5.2",
+ "x86_64",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -32,7 +42,7 @@ checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
 [[package]]
 name = "serenelib"
 version = "0.1.0"
-source = "git+https://github.com/serenekernel/serenelib.git#cb2c1c12b5a437367bae7d08b6404760e570b764"
+source = "git+https://github.com/serenekernel/serenelib.git#53fc35504d9783af19ce67f35ffd3e9e3ec2f67b"
 dependencies = [
  "lazy_static",
  "spin 0.5.2",
@@ -50,16 +60,6 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
-
-[[package]]
-name = "test"
-version = "0.1.0"
-dependencies = [
- "lazy_static",
- "serenelib",
- "spin 0.5.2",
- "x86_64",
-]
 
 [[package]]
 name = "volatile"

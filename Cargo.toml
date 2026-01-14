@@ -1,5 +1,5 @@
 [package]
-name = "test"
+name = "init_system"
 version = "0.1.0"
 edition = "2024"
 
@@ -22,6 +22,6 @@ lto = false
 strip = false
 
 [[bin]]
-name = "test"
+name = "init_system"
 test = false
 bench = false
