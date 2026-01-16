@@ -22,7 +22,7 @@ fn test_proccess_creation() -> Result<(), SyscallError> {
         process,
         memobj,
         Some(vaddr),
-        MemObjPerms::READ | MemObjPerms::WRITE | MemObjPerms::EXEC,
+        MemObjPerms::READ | MemObjPerms::EXEC,
         MemObjMapFlags::FIXED,
     )?;
     
