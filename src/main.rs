@@ -3,43 +3,21 @@
 use core::panic::PanicInfo;
 use serenelib::debug_writer::{_print};
 use serenelib::syscalls::{
-    sys_cap_port_grant, sys_exit, sys_endpoint_create, sys_endpoint_destroy, 
-    sys_endpoint_receive, sys_endpoint_free_message, sys_wait_for,
-    sys_process_create_empty, sys_memobj_create, sys_map, sys_copy_to, sys_start,
-    MemObjPerms, MemObjMapFlags, SyscallError
+    MemObjMapFlags, MemObjPerms, SyscallError, sys_cap_initramfs, sys_cap_port_grant, sys_copy_to, sys_endpoint_create, sys_endpoint_destroy, sys_endpoint_free_message, sys_endpoint_receive, sys_exit, sys_map, sys_memobj_create, sys_process_create_empty, sys_start, sys_wait_for
 };
 use serenelib::{print, println};
 
-fn test_proccess_creation() -> Result<(), SyscallError> {    
-    let process = sys_process_create_empty()?;    
-    let page_size = 4096;
-    let perms = MemObjPerms::READ | MemObjPerms::WRITE | MemObjPerms::EXEC;
-    
-    let memobj = sys_memobj_create(page_size, perms)?;
-    
-    let vaddr = 0x40000000;
-    let mapped_addr = sys_map(
-        process,
-        memobj,
-        Some(vaddr),
-        MemObjPerms::READ | MemObjPerms::EXEC,
-        MemObjMapFlags::FIXED,
-    )?;
-    
-    let simple_code: &[u8] = &[
-        0xbf, 0x01, 0x00, 0x00, 0x00,  // mov edi, 1
-        0xbe, 0x2a, 0x00, 0x00, 0x00,  // mov esi, 42
-        0x0f, 0x05,                    // syscall
-    ];  
-    
-    sys_copy_to(
-        process,
-        mapped_addr,
-        simple_code.as_ptr(),
-        simple_code.len(),
-    )?;
-    
-    sys_start(process, mapped_addr)?;    
+use crate::elf_loader::load_elf;
+mod elf_loader;
+
+fn test_proccess_creation() -> Result<(), SyscallError> { 
+    let initramfs_val = sys_cap_initramfs()?;
+    let initramfs = unsafe {
+        core::slice::from_raw_parts(initramfs_val as *const u8, 50 *1024 * 1024)
+    };
+
+    let (process, entry_point) = load_elf(initramfs)?;
+    sys_start(process, entry_point)?;
     Ok(())
 }
 
