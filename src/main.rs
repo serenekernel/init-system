@@ -77,8 +77,11 @@ pub extern "C" fn _start() -> ! {
     sys_exit(0);
 }
 
+
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    println!("panic: {}", info);
+    println!("panic: {}", info.message());
+    println!("at {:?}", info.location());
+    
     sys_exit(1);
 }
