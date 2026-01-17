@@ -9,15 +9,28 @@ use serenelib::{print, println};
 
 use crate::elf_loader::load_elf;
 mod elf_loader;
+mod tar;
 
-fn test_proccess_creation() -> Result<(), SyscallError> { 
+extern crate alloc;
+use alloc::vec::Vec;
+pub struct SysAllocator;
+
+fn load_servers() -> Result<(), SyscallError> {
     let initramfs_val = sys_cap_initramfs()?;
     let initramfs = unsafe {
         core::slice::from_raw_parts(initramfs_val as *const u8, 50 *1024 * 1024)
     };
 
-    let (process, entry_point) = load_elf(initramfs)?;
+    let tar_archive = tar::TarArchive::new(initramfs);
+    let files = tar_archive.list("/");
+    for file in files {
+        println!("initramfs: {}", file);
+    }
+
+    let elf_file = tar_archive.read("/test.elf").expect("failed to read elf binary");
+    let (process, entry_point) = load_elf(elf_file)?;
     sys_start(process, entry_point)?;
+    
     Ok(())
 }
 
@@ -29,7 +42,7 @@ pub extern "C" fn _start() -> ! {
     // @todo: fix that
     let endpoint = sys_endpoint_create().expect("sys_endpoint_create failed");
 
-    test_proccess_creation().expect("test_proccess_creation failed");
+    load_servers().expect("failed to load servers");
     sys_wait_for(endpoint).expect("sys_wait_for failed");
     let (message_ptr, _total_size) = sys_endpoint_receive(endpoint).expect("sys_endpoint_receive failed");
     
